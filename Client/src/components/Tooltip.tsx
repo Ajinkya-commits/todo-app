@@ -19,6 +19,27 @@ const Tooltip = () => {
     setOpenTask((prev) => !prev);
   };
 
+  const addtodo = async() =>{
+    try {
+      const response = await axios.post(`${BACKEND_URL}/api/v1/todos/create`,{
+        title,
+        description,
+        priority,
+        userId : localStorage.getItem('userId')
+      },{
+        headers:{
+          Authorization : localStorage.getItem("token"),
+        },
+      })
+        console.log(response.data.todos.id);
+   navigate(`/task`)
+    } catch (error) {
+      console.error("error while adding todo ",error)
+    } finally{
+      setLoading(false);
+    }
+  }
+
   return (
     <>
     <button
@@ -77,26 +98,11 @@ const Tooltip = () => {
       setPriority(e.target.value);
     }} />
   </div>
-  <button type="submit" onClick={async()=>{
+  <button type="submit" onClick={async(e)=>{
+    e.preventDefault();
     setLoading(true)
-    try {
-      const response = await axios.post(`${BACKEND_URL}/api/v1/todos/create`,{
-        title,
-        description,
-        priority,
-        userId : localStorage.getItem('userId')
-      },{
-        headers:{
-          Authorization : localStorage.getItem("token"),
-        },
-      })
-        console.log(response.data.todos.id);
-   navigate(`/task`)
-    } catch (error) {
-      console.error("error while adding todo ",error)
-    } finally{
-      setLoading(false);
-    }
+    await addtodo();
+    window.location.reload();
   }} className="text-white bg-[#1a9e64] hover:bg-slate-500 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center ">{loading ? "Adding..." : "Add Todo"}</button>
 </form>
 <Lottie className="sm:block hidden"
